@@ -1,5 +1,6 @@
-var builder = require('botbuilder');
 require('dotenv-extended').load();
+
+var builder = require('botbuilder');
 
 var connector = new builder.ChatConnector({
 	appId: process.env.MICROSOFT_APP_ID,
@@ -19,13 +20,13 @@ var bot = new builder.UniversalBot(connector, [
 ]);
 
 const recognizer = new builder.LuisRecognizer(process.env.LUIS_MODEL_URL);
-recognizer.onEnabled(function(context, callback) {
-	if (context.dialogStack().length > 0) {
-		callback(null, false);
-	} else {
-		callback(null, true);
-	}
-});
+// recognizer.onEnabled(function(context, callback) {
+// 	if (context.dialogStack().length > 0) {
+// 		callback(null, false);
+// 	} else {
+// 		callback(null, true);
+// 	}
+// });
 bot.recognizer(recognizer);
 
 bot.dialog('onboarding', [
@@ -34,7 +35,7 @@ bot.dialog('onboarding', [
 		session.endDialog();
 	}
 ]).triggerAction({
-	matches: /^On-Boarding?/
+	matches: 'On-Boarding'
 });
 
 bot.dialog('ensureProfile', [

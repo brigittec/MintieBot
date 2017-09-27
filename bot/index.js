@@ -8,16 +8,34 @@ var connector = new builder.ChatConnector({
 
 var bot = new builder.UniversalBot(connector, [
 	function (session) {
-		session.beginDialog('ensureProfile', session.userData.profile);
-	}, 
-	function (session, results) {
-		const profile = session.userData.profile = results.response;
-		//session.send("Hello " + profile.name + ". I love " + profile.company);
-			//session.endConversation("Hello " + profile.name + ". I love " + profile.company);
-		session.endConversation(`Hello ${profile.name}.  I love ${profile.company}`);
+		// 	session.beginDialog('ensureProfile', session.userData.profile);
+		// }, 
+		// function (session, results) {
+		// 	const profile = session.userData.profile = results.response;
+		// 	session.endConversation(`Hello ${profile.name}.  I love ${profile.company}`);
+		// }
+		session.send('Sorry I did not understand');
 	}
 ]);
 
+const recognizer = new builder.LuisRecognizer(process.env.LUIS_MODEL_URL);
+recognizer.onEnabled(function(context, callback) {
+	if (context.dialogStack().length > 0) {
+		callback(null, false);
+	} else {
+		callback(null, true);
+	}
+});
+bot.recognizer(recognizer);
+
+bot.dialog('onboarding', [
+	function (session) {
+		session.send('Welcome to the Project On-Boarding explanation');
+		session.endDialog();
+	}
+]).triggerAction({
+	matches: /^On-Boarding?/
+});
 
 bot.dialog('ensureProfile', [
 		function(session, args, next) {

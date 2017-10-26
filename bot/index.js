@@ -15,9 +15,11 @@ var bot = new builder.UniversalBot(connector, [
 		// 	const profile = session.userData.profile = results.response;
 		// 	session.endConversation(`Hello ${profile.name}.  I love ${profile.company}`);
 		// }
-		session.send('Sorry I did not understand');
+		//session.send('Sorry I did not understand');
+		session.beginDialog('/default');
 	}
 ]);
+
 
 const recognizer = new builder.LuisRecognizer(process.env.LUIS_MODEL_URL);
 // recognizer.onEnabled(function(context, callback) {
@@ -29,99 +31,100 @@ const recognizer = new builder.LuisRecognizer(process.env.LUIS_MODEL_URL);
 // });
 bot.recognizer(recognizer);
 
-bot.dialog('onboarding', [
-	function (session) {
-		session.dialogData.yesnoanswer = {};
-		builder.Prompts.text(session, "Would you like to see the Project On-Boarding Process?")
-	},
-	function (session, results) {
-		if (results.response) {
-			session.dialogData.yesnoanswer = results.response;
-		}
 
-		if (session.dialogData.yesnoanswer == 'yes') {
-			session.endDialog('This is where i should send you a picture');
-		}
-		else {
-			session.endDialog('No problem.  Try something different.');
-		}
-	}
-]).triggerAction({
-	matches: 'On-Boarding'
-});
+// bot.dialog('onboarding', [
+// 	function (session) {
+// 		session.dialogData.yesnoanswer = {};
+// 		builder.Prompts.text(session, "Would you like to see the Project On-Boarding Process?")
+// 	},
+// 	function (session, results) {
+// 		if (results.response) {
+// 			session.dialogData.yesnoanswer = results.response;
+// 		}
 
-bot.dialog('ensureProfile', [
-		function(session, args, next) {
-			session.dialogData.profile = args || {};
+// 		if (session.dialogData.yesnoanswer == 'yes') {
+// 			session.endDialog('This is where i should send you a picture');
+// 		}
+// 		else {
+// 			session.endDialog('No problem.  Try something different.');
+// 		}
+// 	}
+// ]).triggerAction({
+// 	matches: 'onboarding'
+// });
 
-			if (!session.dialogData.profile.name) {
-				builder.Prompts.text(session, "What's your name?");
-			} else {
-				next();
-			}
-		},
-		function (session, results, next) {
-			//results of prompt will be in results.response
-			if (results.response) {
-				session.dialogData.profile.name = results.response;
-			}
+// bot.dialog('ensureProfile', [
+// 		function(session, args, next) {
+// 			session.dialogData.profile = args || {};
 
-			if (!session.dialogData.profile.company) {
-				builder.Prompts.text(session, "What company do you work for?");
-			} else {
-				next();
-			}
+// 			if (!session.dialogData.profile.name) {
+// 				builder.Prompts.text(session, "What's your name?");
+// 			} else {
+// 				next();
+// 			}
+// 		},
+// 		function (session, results, next) {
+// 			//results of prompt will be in results.response
+// 			if (results.response) {
+// 				session.dialogData.profile.name = results.response;
+// 			}
 
-		},
-		function (session, results) {
-			if (results.response) {
-				session.dialogData.profile.company = results.response;
-			}
-			session.endDialogWithResult({response: session.dialogData.profile});
-		}
-	]);
+// 			if (!session.dialogData.profile.company) {
+// 				builder.Prompts.text(session, "What company do you work for?");
+// 			} else {
+// 				next();
+// 			}
 
-bot.dialog('help', [
-		function (session) {
-			session.endDialog("I'm a simply bot!");;
-		}
-	]).triggerAction({
-		matches: /^help$/,
-		onSelectAction: function (session, args) {
-			//runs just before the dialog launches and allows you to change default behavior
-			session.beginDialog(args.action, args);
-		}
-	});
+// 		},
+// 		function (session, results) {
+// 			if (results.response) {
+// 				session.dialogData.profile.company = results.response;
+// 			}
+// 			session.endDialogWithResult({response: session.dialogData.profile});
+// 		}
+// 	]);
 
-bot.dialog('search', [
-	function (session, args, next) {
-		if (session.message.text.toLowerCase() == 'search') {
-			builder.Prompts.text(session, "Who did you want to search for?")
-		} else {
-			var query = session.message.text.substring(7);
-			next ({response: query});
-		}
-	},
-	function (session, results, next) {
-		var query = results.response;
-		if (!query) {
-			session.endDialog("Request cancelled");
-		} else {
-			//session.endDialog("You want to search for " + query);
+// bot.dialog('help', [
+// 		function (session) {
+// 			session.endDialog("I'm a simply bot!");;
+// 		}
+// 	]).triggerAction({
+// 		matches: /^help$/,
+// 		onSelectAction: function (session, args) {
+// 			//runs just before the dialog launches and allows you to change default behavior
+// 			session.beginDialog(args.action, args);
+// 		}
+// 	});
 
-			//if you did get data here and want user to select one of the options 
-			//present results as buttons:
-			var arrayOfOptions = ['Brigitte', 'Justin', 'Connor', 'Chris', 'Carli'];
-			builder.Prompts.choice(session, "Select one", arrayOfOptions, {listStyle: builder.ListStyle.button});
-		}
-	},
-	function (session, results, next) {
-		//when using choice the selected value is inside results.response.entity
-		session.endConversation('You chose ' + results.response.entity);
-	}
-]).triggerAction({
-	matches: /^search?/
-});
+// bot.dialog('search', [
+// 	function (session, args, next) {
+// 		if (session.message.text.toLowerCase() == 'search') {
+// 			builder.Prompts.text(session, "Who did you want to search for?")
+// 		} else {
+// 			var query = session.message.text.substring(7);
+// 			next ({response: query});
+// 		}
+// 	},
+// 	function (session, results, next) {
+// 		var query = results.response;
+// 		if (!query) {
+// 			session.endDialog("Request cancelled");
+// 		} else {
+// 			//session.endDialog("You want to search for " + query);
+
+// 			//if you did get data here and want user to select one of the options 
+// 			//present results as buttons:
+// 			var arrayOfOptions = ['Brigitte', 'Justin', 'Connor', 'Chris', 'Carli'];
+// 			builder.Prompts.choice(session, "Select one", arrayOfOptions, {listStyle: builder.ListStyle.button});
+// 		}
+// 	},
+// 	function (session, results, next) {
+// 		//when using choice the selected value is inside results.response.entity
+// 		session.endConversation('You chose ' + results.response.entity);
+// 	}
+// ]).triggerAction({
+// 	matches: /^search?/
+// });
 
 var connectorListener = connector.listen();
 
@@ -133,6 +136,12 @@ function listen() {
 	};
 }
 
+function dialog(fnName, fn) {
+	return bot.dialog(fnName, fn);
+}
+
+
 module.exports = {
-	listen: listen
+	listen: listen,
+	dialog: dialog
 };
